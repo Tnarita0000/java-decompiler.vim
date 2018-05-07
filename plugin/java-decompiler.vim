@@ -21,13 +21,22 @@ endf
 func! s:Decompile() abort
   call s:FindOrGetJDA()
 
-  let filename = expand("%")
-  echo filename
+  let java_files_location = "~/.java-decompiler.cache"
+  let current_dir         = execute("pwd")
+  let filename            = expand("%")
+
+  if finddir(java_files_location) == ""
+    execute("!mkdir " . java_files_location)
+  endif
+
   if filename =~ ".*.jar"
-    execute("!jar -xf " . filename . " && find . -iname \"*.class\" | xargs jad -r -s java")
+    "execute("!mv " . filename . " " . java_files_location . "; cd " . java_files_location)
+    let command = "!jar -xf " . filename . " && find . -iname \"*.class\" | xargs echo"
+    execute(command)
+    echo command
   elseif filename =~ ".*.class"
-    execute("!jad -r -s java " . filename)
-    echo "======================="
+    let command = "!jad -r -s java " . filename . " -d " . java_files_location
+    execute(command)
   endif
 
   setl ft=java
