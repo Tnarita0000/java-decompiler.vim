@@ -3,7 +3,7 @@ if exists("g:jda_loaded")
 endif
 let g:jda_loaded = 1
 
-function! s:FindOrGetJDA() abort
+function! s:FindOrGetJad() abort
   if !executable("jad")
     if has("win64")
       execute("!wget https://varaneckas.com/jad/jad158g.win.zip -O /tmp/jad.zip")
@@ -19,7 +19,7 @@ function! s:FindOrGetJDA() abort
 endf
 
 func! s:Decompile() abort
-  call s:FindOrGetJDA()
+  call s:FindOrGetJad()
 
   let java_files_location = "~/.java-decompiler.cache"
   let current_dir         = execute("pwd")
@@ -33,7 +33,6 @@ func! s:Decompile() abort
     "execute("!mv " . filename . " " . java_files_location . "; cd " . java_files_location)
     let command = "!jar -xf " . filename . " && find . -iname \"*.class\" | xargs echo"
     execute(command)
-    echo command
   elseif filename =~ ".*.class"
     let command = "!jad -r -s java " . filename . " -d " . java_files_location
     execute(command)
@@ -45,4 +44,4 @@ func! s:Decompile() abort
   setl nomodified
 endf
 
-com! DejavaThis call <SID>Decompile()
+command! Jad call <SID>Decompile()
