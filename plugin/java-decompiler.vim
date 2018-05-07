@@ -4,6 +4,7 @@ endif
 let g:jda_loaded = 1
 
 function! s:FindOrGetJad() abort
+  " reference: https://varaneckas.com/jad/
   if !executable("jad")
     if has("win64")
       execute("!wget https://varaneckas.com/jad/jad158g.win.zip -O /tmp/jad.zip")
