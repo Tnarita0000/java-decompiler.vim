@@ -3,46 +3,46 @@ if exists("g:jda_loaded")
 endif
 let g:jda_loaded = 1
 
+let s:java_files_location = "~/.java-decompiler.cache"
+let s:jad_location        = s:java_files_location . "/bin/jad"
+let s:current_dir         = execute("pwd")
+let s:filename            = expand("%")
+
 function! s:FindOrGetJad() abort
-  " reference: https://varaneckas.com/jad/
-  if !executable("jad")
+  if finddir(s:java_files_location) == ""
+    execute("!mkdir -p " . s:java_files_location . "/bin")
+  endif
+
+  if findfile(s:jad_location) == ""
     if has("win64")
       execute("!wget https://varaneckas.com/jad/jad158g.win.zip -O /tmp/jad.zip")
-    else
-      if execute("!uname") == "Linux"
-        execute("!wget https://varaneckas.com/jad/jad158e.linux.intel.zip -O /tmp/jad.zip")
-      else
-        execute("!wget https://varaneckas.com/jad/jad158g.mac.intel.zip -O /tmp/jad.zip")
-      endif
-      execute("!unzip /tmp/jad.zip -d /tmp/; mv /tmp/jad /usr/local/bin/")
+    elseif has("osx")
+      execute("!wget https://varaneckas.com/jad/jad158g.mac.intel.zip -O /tmp/jad.zip")
+    elseif has("unix")
+      execute("!wget https://varaneckas.com/jad/jad158e.linux.static.zip -O /tmp/jad.zip")
     endif
+    execute("!unzip /tmp/jad.zip -d /tmp/; mv /tmp/jad " . s:jad_location)
   endif
 endf
 
-func! s:Decompile() abort
+function! s:Decompile() abort
   call s:FindOrGetJad()
 
-  let java_files_location = "~/.java-decompiler.cache"
-  let current_dir         = execute("pwd")
-  let filename            = expand("%")
-
-  if finddir(java_files_location) == ""
-    execute("!mkdir " . java_files_location)
-  endif
-
-  if filename =~ ".*.jar"
-    "execute("!mv " . filename . " " . java_files_location . "; cd " . java_files_location)
-    let command = "!jar -xf " . filename . " && find . -iname \"*.class\" | xargs echo"
+  if s:filename =~ ".*.jar"
+    execute("!cp " . expand("%:p") . " " . s:java_files_location)
+    execute("cd " . s:java_files_location)
+    let command = "!jar -xf " . expand("%:t") . " && find . -iname \"*.class\" -print0 | xargs -0 " . s:jad_location . " -r"
     execute(command)
-  elseif filename =~ ".*.class"
-    let command = "!jad -r -s java " . filename . " -d " . java_files_location
+    echo command
+  elseif s:filename =~ ".*.class"
+    let command = "!jad -r -s java " . s:filename . " -d " . s:java_files_location
     execute(command)
   endif
 
-  setl ft=java
-  setl syntax=java
-  setl readonly
-  setl nomodified
+  setlocal ft=java
+  setlocal syntax=java
+  setlocal readonly
+  setlocal nomodified
 endf
 
 command! Jad call <SID>Decompile()
