@@ -6,7 +6,7 @@ let g:jda_loaded = 1
 let s:java_files_location = "~/.java-decompiler.cache"
 let s:jad_location        = s:java_files_location . "/bin/jad"
 let s:current_dir         = execute("pwd")
-let s:filename            = expand("%")
+let s:filename            = expand("%:t")
 
 function! s:FindOrGetJad() abort
   if finddir(s:java_files_location) == ""
@@ -31,7 +31,9 @@ function! s:Decompile() abort
   if s:filename =~ ".*.jar"
     execute("!cp " . expand("%:p") . " " . s:java_files_location)
     execute("cd " . s:java_files_location)
-    let command = "!jar -xf " . expand("%:t") . " && find . -iname \"*.class\" -print0 | xargs -0 " . s:jad_location . " -r"
+    let command = "!jar -xf " . s:filename
+          \. " && find . -iname \"*.class\" -print0 | xargs -0 "
+          \. s:jad_location . " -r"
     execute(command)
     echo command
   elseif s:filename =~ ".*.class"
