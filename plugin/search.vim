@@ -44,28 +44,33 @@ function s:MoveUpDir()
   execute "lcd ../" 
 endfunction
 
-let s:count = 0
-while s:count < len(s:fullpath)
-  let currentpath = "/" . join(s:fullpath, "/")
-  call s:FindProjectRoot(currentpath)
-  if s:config_file
-    break
-  endif
-  call s:MoveUpDir()
-  call remove(s:fullpath, -1)
-endwhile
-
-if s:config_file != ""
-  for line in readfile(s:config_file)
-    if s:IsDependencyKeyword(line)
-      let s:dependency = matchstr(line, "\\(\".\\{\\-\\}\"\\)\\|\\('.\\{\\-\\}'\\)")[1:-2]
-      if s:dependency != ""
-        call add(s:dependencies, s:dependency)
-      endif
+function search#Main()
+  let s:count = 0
+  while s:count < len(s:fullpath)
+    let currentpath = "/" . join(s:fullpath, "/")
+    call s:FindProjectRoot(currentpath)
+    if s:config_file
+      break
     endif
-  endfor
-end
-echo s:dependencies
+    call s:MoveUpDir()
+    call remove(s:fullpath, -1)
+  endwhile
+
+  if s:config_file != ""
+    for line in readfile(s:config_file)
+      if s:IsDependencyKeyword(line)
+        let s:string_regexp_in_literal = "\\('\\)\\@<=.*\\('\\)\\@=\\|\\(\"\\)\\@<=.*\\(\"\\)\\@="
+        let s:dependency = matchstr(line, s:string_regexp_in_literal)
+        if s:dependency != ""
+          call add(s:dependencies, s:dependency)
+        endif
+      endif
+    endfor
+  else
+    cd %:h
+  end
+endfunction
+"echo s:dependencies
 
 "let target1 = "compile (\"org.jetbrains.kotlin:kotlin-stdlib-jre6\")"
 "let target2 = "compile ('org.jetbrains.kotlin:kotlin-stdlib-jre7')"
