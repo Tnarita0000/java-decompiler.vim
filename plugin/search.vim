@@ -58,29 +58,25 @@ endwhile
 if s:config_file != ""
   for line in readfile(s:config_file)
     if s:IsDependencyKeyword(line)
-      let s:dependency = matchstr(line, "\(\"\|'\).\{-}\(\"\|'\)")
-      "let s:dependency = s:dependency[1:-2]
+      let s:dependency = matchstr(line, "\\(\".\\{\\-\\}\"\\)\\|\\('.\\{\\-\\}'\\)")[1:-2]
       if s:dependency != ""
         call add(s:dependencies, s:dependency)
       endif
     endif
   endfor
 end
+echo s:dependencies
 
-echo "\"org.jetbrains.kotlin:kotlin-stdlib-jre8\" 'org.jetbrains.kotlin:kotlin-stdlib-jre8' 'org.jetbrains.kotlin:kotlin-stdlib-jre8'"
-echo "----------------------"
+"let target1 = "compile (\"org.jetbrains.kotlin:kotlin-stdlib-jre6\")"
+"let target2 = "compile ('org.jetbrains.kotlin:kotlin-stdlib-jre7')"
 
-let double_quote_regexp = "\".*\""
-let double_quote_matched = matchstr("\"org.jetbrains.kotlin:kotlin-stdlib-jre8\" 'org.jetbrains.kotlin:kotlin-stdlib-jre8' 'org.jetbrains.kotlin:kotlin-stdlib-jre8'", double_quote_regexp)
-echo "double quote: " . double_quote_matched
-
-let single_quote_regexp = "'.*'"
-let single_quote_matched = matchstr("\"org.jetbrains.kotlin:kotlin-stdlib-jre8\" 'org.jetbrains.kotlin:kotlin-stdlib-jre8' 'org.jetbrains.kotlin:kotlin-stdlib-jre8'", single_quote_regexp)
-echo "single quote: " . single_quote_matched
-
-let both_regexp = "(\"|').*\{-}(\"|')"
-let both_matched = matchstr("\"org.jetbrains.kotlin:kotlin-stdlib-jre8\" 'org.jetbrains.kotlin:kotlin-stdlib-jre8' 'org.jetbrains.kotlin:kotlin-stdlib-jre8'", both_regexp)
-echo "both: " . both_matched
-
-
-"echo "......" . fnamemodify(currentpath, ":p:h") . "......"
+"let both_regexp = "\(\"\|'\).*\{-}\(\"\|'\)"
+"let both_regexp = "\(\"\|'\).*\(\"\|'\)"
+"let both_regexp = "\(\"\|'\).*"
+"let both_regexp = "\(\".*\"\)\|\('.*'\)"
+"let both_regexp = "\\(\".*\"\\)\\|\\('.*'\\)"
+"let both_regexp = "\\(\".\\{\\-\\}\"\\)\\|\\('.\\{\\-\\}'\\)"
+"let both_matched = matchstr(target1, both_regexp)
+"echo both_matched
+"let both_matched = matchstr(target2, both_regexp)
+"echo both_matched
