@@ -58,12 +58,15 @@ endwhile
 if s:config_file != ""
   for line in readfile(s:config_file)
     if s:IsDependencyKeyword(line)
-      let s:dependency = matchstr(line, "\\(\".\\{\\-\\}\"\\)\\|\\('.\\{\\-\\}'\\)")[1:-2]
+      let s:string_regexp_in_literal = "\\('\\)\\@<=.*\\('\\)\\@=\\|\\(\"\\)\\@<=.*\\(\"\\)\\@="
+      let s:dependency = matchstr(line, s:string_regexp_in_literal)
       if s:dependency != ""
         call add(s:dependencies, s:dependency)
       endif
     endif
   endfor
+else
+  cd %:h
 end
 echo s:dependencies
 
