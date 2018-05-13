@@ -1,4 +1,4 @@
-let s:fullpath                   = split(expand("%:p"), "\/")
+let s:fullpath                   = split(expand("%:p:h"), "\/")
 let s:config_patterns            = ["build.gradle", "pom.xml"]
 let s:config_file                = ""
 let s:gradle_dependency_keywords = ["compile", "runtime"]
