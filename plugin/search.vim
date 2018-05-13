@@ -1,4 +1,4 @@
-let s:fullpath                   = split(expand("%:h"), "\/")
+let s:fullpath                   = split(expand("%:p"), "\/")
 let s:config_patterns            = ["build.gradle", "pom.xml"]
 let s:config_file                = ""
 let s:gradle_dependency_keywords = ["compile", "runtime"]
@@ -55,7 +55,7 @@ while s:count < len(s:fullpath)
   call remove(s:fullpath, -1)
 endwhile
 
-if exists("s:config_file")
+if s:config_file != ""
   for line in readfile(s:config_file)
     if s:IsDependencyKeyword(line)
       let s:dependency = matchstr(line, "\(\"\|'\).\{-}\(\"\|'\)")
@@ -84,4 +84,3 @@ echo "both: " . both_matched
 
 
 "echo "......" . fnamemodify(currentpath, ":p:h") . "......"
-"
