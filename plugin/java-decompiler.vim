@@ -26,8 +26,6 @@ function! s:FindOrGetJad() abort
 endf
 
 function! s:Decompile() abort
-  call s:FindOrGetJad()
-
   if s:filename =~ ".*.jar"
     execute("!cp " . expand("%:p") . " " . s:java_files_location)
     execute("cd " . s:java_files_location)
@@ -48,3 +46,4 @@ function! s:Decompile() abort
 endf
 
 command! Jad call <SID>Decompile()
+command! FindOrGetJad <SID>FindOrGetJad()j
