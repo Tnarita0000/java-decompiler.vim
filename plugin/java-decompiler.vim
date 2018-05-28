@@ -45,5 +45,6 @@ function! s:Decompile() abort
   setlocal nomodified
 endf
 
-command! Jad call <SID>Decompile()
-command! FindOrGetJad <SID>FindOrGetJad()j
+command! Jad call s:Decompile()
+command! FindOrGetJad call s:FindOrGetJad()
+command! SearchDependencies call search#Main()
