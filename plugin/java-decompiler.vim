@@ -74,19 +74,7 @@ function s:FindProjectRoot()
   endwhile
 endfunction
 
-function s:ScanDependencies()
-  for line in readfile(s:config_file)
-    if s:IsDependencyKeyword(line)
-      let s:string_regexp_in_literal = "\\('\\)\\@<=.*\\('\\)\\@=\\|\\(\"\\)\\@<=.*\\(\"\\)\\@="
-      let s:dependency = matchstr(line, s:string_regexp_in_literal)
-      if s:dependency != ""
-        call add(s:dependencies, s:dependency)
-      endif
-    endif
-  endfor
-endfunction
-
-function FindLibraryPath(dependency)
+function s:FindLibraryPath(dependency)
   let s:targetPath = join(split(a:dependency, ':'), '/')
   let s:filelist = split(glob("~/.gradle/**/*.jar"), "\n")
   for file in s:filelist
@@ -103,19 +91,28 @@ function s:DecompileJarFiles()
 endfunction
 
 function s:ResolveDependencyLibralies()
-  call s:FindProjectRoot()
-
   if s:config_file != ""
-    call s:ScanDependencies()
     let s:count = 0
     while s:count < len(s:dependencies)
-      call FindLibraryPath(s:dependencies[s:count])
+      call s:FindLibraryPath(s:dependencies[s:count])
       let s:count += 1
     endwhile
   endif
-
   call s:DecompileJarFiles()
 endfunction
+
+function s:ScanDependencies()
+  for line in readfile(s:config_file)
+    if s:IsDependencyKeyword(line)
+      let s:string_regexp_in_literal = "\\('\\)\\@<=.*\\('\\)\\@=\\|\\(\"\\)\\@<=.*\\(\"\\)\\@="
+      let s:dependency = matchstr(line, s:string_regexp_in_literal)
+      if s:dependency != ""
+        call add(s:dependencies, s:dependency)
+      endif
+    endif
+  endfor
+endfunction
+
 
 function! s:Search()
   let s:count = 0
@@ -130,15 +127,8 @@ function! s:Search()
   endwhile
 
   if s:config_file != ""
-    for line in readfile(s:config_file)
-      if s:IsDependencyKeyword(line)
-        let s:string_regexp_in_literal = "\\('\\)\\@<=.*\\('\\)\\@=\\|\\(\"\\)\\@<=.*\\(\"\\)\\@="
-        let s:dependency = matchstr(line, s:string_regexp_in_literal)
-        if s:dependency != ""
-          call add(s:dependencies, s:dependency)
-        endif
-      endif
-    endfor
+    call s:ScanDependencies()
+    call s:ResolveDependencyLibralies()
   else
     cd %:h
   end
