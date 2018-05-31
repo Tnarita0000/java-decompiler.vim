@@ -94,15 +94,17 @@ endfunction
 function s:DecompileJarFiles()
   if !len(s:dependency_files) | return | endif
   execute("cd " . s:target_dir . "/.extensions/")
-  execute("split job_test")
   for file in s:dependency_files
     let s:command = "jar -xf " . file . " && find . -iname \"*.class\" -print0 | xargs -0 jad -r -s java"
     let s:command_arr = ['jar', '-xf', file, '&&', 'find', '.', '-iname', '\"*.class\"', '-print0', '|', 'xargs', '-0', 'jad', '-r', '-s', 'java']
-    execute("!jar -xf " . file . " && find . -iname \"*.class\" -print0 | xargs -0 jad -r -s java")
+    "execute("!jar -xf " . file . " && find . -iname \"*.class\" -print0 | xargs -0 jad -r -s java")
+    echom s:command
+    call system("exec jar -xf " . file . " && find . -iname \"*.class\" -print0 | xargs -0 jad -r -s java")
     "call job_start("vim --version", { "out_io" : "buffer", "out_name" : "job_test" })
     "call job_start(['jar', '-xf', '/Users/naritatakuya/.gradle/caches/modules-2/files-2.1/com.jfoenix/jfoenix/1.10.0/996b4c64e59be5d7f1ea343fe49f560a6bdbe858/jfoenix-1.10.0.jar', '&&', 'find', '.', '-type', 'f', '|', 'grep', '\.class$'], { "out_io" : "buffer", "out_name" : "job_test" })
     "call job_start(['find', '.', '-type', 'f'], {"out_io": "buffer", "out_name": "job_test", "callback" : "EchoMessage"})
   endfor
+  echom "Generated class files."
 endfunction
 
 function s:ResolveDependencyLibralies()
